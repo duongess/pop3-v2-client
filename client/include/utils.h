@@ -1,5 +1,5 @@
-#include "../common/utils.h"
-#include "../types/clientInput.h"
+#include "common/utils.h"
+#include "types/clientInput.h"
 
 void menuClient();
 void menuPop3v2();

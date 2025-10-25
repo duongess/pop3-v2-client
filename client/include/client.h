@@ -1,10 +1,10 @@
-#include "../common/utils.h"
+#include "common/utils.h"
 #include "utils.h"
-#include "../common/protocol.h"
-#include "../types/request.h"
-#include "../types/clientInput.h"
-#include "../types/state.h"
-#include "state/db.h"
+#include "common/protocol.h"
+#include "types/request.h"
+#include "types/clientInput.h"
+#include "types/state.h"
+#include "db.h"
 
 using pop::RequestPopV2;
 

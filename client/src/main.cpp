@@ -1,6 +1,6 @@
 // Interactive client with menu/cases
 #include "client.h"
-#include "../config/config.h"
+#include "config/config.h"
 #include "utils.h"
 
 int main(int argc, char* argv[]) {

@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Sqlite/sqlite3.h"
+#include "sqlite3.h"
 #include "../../common/utils.h"
 
 class DbConnection {
