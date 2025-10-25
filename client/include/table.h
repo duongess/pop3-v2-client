@@ -1,7 +1,7 @@
 #pragma once
 #include "../../types/state.h"
 #include "sqlite3.h"
-#include "dbconnection.h"
+#include "client/include/dbConnection.h"
 
 class Table {
 public:
