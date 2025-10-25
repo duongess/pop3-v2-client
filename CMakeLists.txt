@@ -52,28 +52,13 @@ add_library(NetworkSystem_Headers INTERFACE)
 target_include_directories(NetworkSystem_Headers INTERFACE
     ${ROOT_DIR}
     # Thêm các thư mục include chính của Server/Client để dễ gọi header
-    ${ROOT_DIR}/server/include
     ${ROOT_DIR}/client/include 
 )
 
 
 # =================================================================================
-# 3. STORAGE/STATE LAYERS (Link với NetworkSystem_Headers)
+# 3. STATE LAYERS (Link với NetworkSystem_Headers)
 # =================================================================================
-
-# ====== Storage layer ======
-add_library(storage
-  server/src/storage/db.cpp
-  server/src/storage/dbConnection.cpp
-  server/src/storage/table.cpp
-  server/src/storage/user.cpp
-  server/src/storage/mail.cpp
-)
-target_include_directories(storage PUBLIC
-  ${ROOT_DIR}/server/src/storage 
-)
-target_link_libraries(storage PUBLIC sqlite3_vendor NetworkSystem_Headers)
-
 
 # ====== State layer (Client) ======
 add_library(state
@@ -86,27 +71,6 @@ target_include_directories(state PUBLIC
   ${ROOT_DIR}/client/src/state
 )
 target_link_libraries(state PUBLIC sqlite3_vendor NetworkSystem_Headers)
-
-
-# =================================================================================
-# 4. SERVER EXECUTABLE
-# =================================================================================
-
-# ====== Server ======
-add_executable(server
-  server/src/main.cpp
-  server/src/services/tcp.cpp
-  server/src/services/pop3-v2.cpp
-  server/src/session-manager.cpp
-  server/src/service-manager.cpp
-  server/src/server.cpp
-  server/src/utils.cpp
-  common/protocol.cpp
-  common/utils.cpp
-)
-# Server link đến storage và NetworkSystem_Headers
-target_link_libraries(server PRIVATE storage NetworkSystem_Headers)
-
 
 # ====== Client EXECUTABLE ======
 add_executable(client
@@ -126,12 +90,10 @@ target_link_libraries(client PRIVATE state NetworkSystem_Headers)
 
 if (WIN32)
   # Link thư viện mạng Windows
-  target_link_libraries(server PRIVATE Ws2_32)
   target_link_libraries(client PRIVATE Ws2_32)
 endif()
 
 if (MINGW)
   # Nếu dùng std::filesystem với MinGW cũ
-  target_link_libraries(server PRIVATE stdc++fs)
   target_link_libraries(client PRIVATE stdc++fs)
 endif()
