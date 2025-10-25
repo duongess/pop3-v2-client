@@ -23,7 +23,7 @@ bool Client::connect() {
     return true;
 }
 
-void Client::close() { client.close(); }
+void Client::disconnect() { client.disconnect(); }
 
 bool Client::isConnected() {
     return client.isConnected();
@@ -109,7 +109,8 @@ void Client::sendPopv2(const std::string& message) {
     }
     case CliCmd::QUIT: {
       // gửi QUIT và đóng kết nối
-      // send_line("QUIT\r\n"); close();
+      // send_line("QUIT\r\n"); 
+      disconnect();
       break;
     }
     default: break;

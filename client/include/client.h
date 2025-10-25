@@ -18,7 +18,7 @@ class Client {
         DB db;
         std::string request(const std::string& message);
         bool connect();
-        void close();
+        void disconnect();
     public:
         Client();
         void setIp(const std::string& host, const std::string& port) {

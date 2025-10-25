@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
@@ -45,6 +46,10 @@
   using socket_handle_t = int;
   constexpr socket_handle_t invalid_socket_handle = -1;
   #define NET_SOCKET_ERROR (-1)
+  #define closesocket close
+  #define WSAGetLastError() errno
+  #define WSACleanup() (void)0
+  #define SD_BOTH SHUT_RDWR
 #endif
 
 // Nếu bạn có console riêng thì giữ lại include; nếu không, bỏ dòng dưới:
@@ -53,9 +58,6 @@ extern const Console console;
 
 // ===== API =====
 bool net_init();
-void net_cleanup();
-
-void close_socket(socket_handle_t s);
 
 // Trả về IP LAN nếu host là localhost/127.0.0.1/::1, ngược lại trả về host gốc
 std::string normalizeHostForLAN(std::string host);

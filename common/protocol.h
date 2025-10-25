@@ -27,7 +27,7 @@ public:
     bool isConnected();
     bool bindAndListen(const std::string& host, const std::string& port);
     bool acceptClient(Protocol& client);
-    void close();
+    void disconnect();
     void clean();
 
     static void requestStop();

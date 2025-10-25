@@ -11,22 +11,6 @@ bool net_init() {
 #endif
 }
 
-void net_cleanup() {
-#ifdef _WIN32
-  WSACleanup();
-#else
-  // nothing needed
-#endif
-}
-
-void close_socket(socket_handle_t s) {
-#ifdef _WIN32
-  if (s != INVALID_SOCKET) closesocket(s);
-#else
-  if (s >= 0) close(s);
-#endif
-}
-
 // Lấy IP LAN "chính" (không gửi gói nào thật)
 std::string getPrimaryIPv4() {
 #ifdef _WIN32

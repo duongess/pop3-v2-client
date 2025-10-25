@@ -9,7 +9,7 @@ static bool set_reuseaddr(socket_handle_t s) {
 }
 
 Protocol::~Protocol() {
-    close();
+    disconnect();
 }
 
 bool Protocol::isValid() const { return sock != invalid_socket_handle; }
@@ -19,7 +19,7 @@ Protocol::Protocol(Protocol&& other) noexcept
 
 Protocol& Protocol::operator=(Protocol&& other) noexcept {
   if (this != &other) {
-    close(); // đóng handle cũ (nếu có)
+    disconnect(); // đóng handle cũ (nếu có)
     sock = std::exchange(other.sock, invalid_socket_handle);
   }
   return *this;
@@ -47,7 +47,7 @@ bool Protocol::connectTo(const std::string& host, const std::string& port) {
         } else {
             int err = WSAGetLastError();
             std::cerr << "[DEBUG] Connect failed with code: " << err << "\n";
-            close_socket(sock);
+            closesocket(sock);
             sock = invalid_socket_handle;
         }
     }
@@ -56,7 +56,7 @@ bool Protocol::connectTo(const std::string& host, const std::string& port) {
 
     if (sock == invalid_socket_handle) {
         std::cerr << "[TCP] Unable to connect to server\n";
-        net_cleanup();
+        WSACleanup();
         return false;
     }
 
@@ -122,18 +122,18 @@ bool Protocol::acceptClient(Protocol& client) {
 
 
 
-void Protocol::close() {
-    close_socket(this->sock);
+void Protocol::disconnect() {
+    closesocket(this->sock);
 }
 
 void Protocol::clean() {
     if (this->sock != invalid_socket_handle) {
         shutdown(this->sock, SD_BOTH);
-        this->close();
+        this->disconnect();
         this->sock = invalid_socket_handle;
         console.stopping("[TCP] Socket closed\n");
     }
-    net_cleanup();
+    WSACleanup();
 }
 
 void Protocol::requestStop() {
