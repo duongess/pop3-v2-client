@@ -93,6 +93,7 @@ void Client::sendPopv2(const std::string& message) {
     case CliCmd::LOGIN: {
       const LoginArgs& a = std::get<LoginArgs>(pc.payload);
       this->host = a.host;
+      this->port = a.port;
       this->responsePopv2(p.USER(a.user));
       std::string token = this->responsePopv2(p.PASS(a.pass));
       this->username = a.user;
