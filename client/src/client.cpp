@@ -100,7 +100,13 @@ void Client::sendPopv2(const std::string& message) {
       if (token != "") {
         this->token = token;
         db.account.createAccount(a.user, normalizeHostForLAN(a.host), this->port);
-      };
+      }
+      else {
+        disconnect();
+      }
+
+      ;
+
       break;
     }
     case CliCmd::SYNC: {
@@ -109,8 +115,7 @@ void Client::sendPopv2(const std::string& message) {
       break;
     }
     case CliCmd::QUIT: {
-      // gửi QUIT và đóng kết nối
-      // send_line("QUIT\r\n"); 
+      
       disconnect();
       break;
     }

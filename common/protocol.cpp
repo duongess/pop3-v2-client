@@ -124,6 +124,7 @@ bool Protocol::acceptClient(Protocol& client) {
 
 void Protocol::disconnect() {
     closesocket(this->sock);
+    this->sock = invalid_socket_handle;
 }
 
 void Protocol::clean() {
