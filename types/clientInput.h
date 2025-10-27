@@ -5,7 +5,7 @@
 
 enum class CliCmd { LOGIN, SYNC, QUIT, INVALID };
 
-struct LoginArgs { std::string host; std::string user; std::string pass; };
+struct LoginArgs { std::string host; std::string port ;std::string user; std::string pass; };
 struct SyncArgs  {};
 struct QuitArgs  {};
 

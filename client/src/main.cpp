@@ -30,8 +30,10 @@ int main(int argc, char* argv[]) {
       case '2': {
         port = cfg.pop3V2.port;
         client.setIp(host, port);
+        
         while (true)
-        {
+        {  
+          console.debug(client.isConnected());
           if (client.isConnected()) {
             accountInformation(client.getUsername(), client.getHost(), client.getPort());
           }

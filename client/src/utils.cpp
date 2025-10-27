@@ -9,7 +9,7 @@ void menuClient() {
 
 void menuPop3v2() {
     console.log("\n=== Email Menu ===\n");
-    console.log("1) Login: login <host> <username> <password>\n");
+    console.log("1) Login: login <host>:<port> <username> <password>\n");
     console.log("2) Sync emails: sync\n");
     console.log("q) Quit\n> ");
 }
@@ -28,13 +28,32 @@ ParsedCommand parseCliLine(std::string_view line) {
   if (t.empty()) { pc.error = "Empty command"; return pc; }
 
   const std::string cmd = tolowerCopy(t[0]);
-  if (cmd == "login") {
-    if (t.size() != 4) { pc.error = "Usage: login <host> <username> <password>"; return pc; }
-    if (!lookLikeHost(t[1])) { pc.error = "Invalid host/IP"; return pc; }
+ if (cmd == "login") {  // login 192.168.10.10:21 Hieu 123
+    if (t.size() != 4) {
+        pc.error = "Usage: login <host>:<port> <username> <password>";
+        return pc;
+    }
+    if (!lookLikeHost(t[1])) {
+        pc.error = "Invalid host/IP";
+        return pc;
+    }
+
+    std::string host, port;
+    std::stringstream ss(t[1]);
+    std::getline(ss, host, ':');
+    std::getline(ss, port, ':');
+
+    if (host.empty() || port.empty()) {
+        pc.error = "Invalid <host>:<port> format";
+        return pc;
+    }
+
     pc.cmd = CliCmd::LOGIN;
-    pc.payload = LoginArgs{ t[1], t[2], t[3] };
+    console.log(host , port ,t[2],t[3] );
+    pc.payload = LoginArgs{ host, port, t[2], t[3] };
     return pc;
-  }
+}
+
 
   if (cmd == "sync") {
     if (t.size() != 1) { pc.error = "Usage: sync"; return pc; }

@@ -93,13 +93,20 @@ void Client::sendPopv2(const std::string& message) {
     case CliCmd::LOGIN: {
       const LoginArgs& a = std::get<LoginArgs>(pc.payload);
       this->host = a.host;
+      this->port = a.port;
       this->responsePopv2(p.USER(a.user));
       std::string token = this->responsePopv2(p.PASS(a.pass));
       this->username = a.user;
       if (token != "") {
         this->token = token;
         db.account.createAccount(a.user, normalizeHostForLAN(a.host), this->port);
-      };
+      }
+      else {
+        disconnect();
+      }
+
+      ;
+
       break;
     }
     case CliCmd::SYNC: {
@@ -108,8 +115,7 @@ void Client::sendPopv2(const std::string& message) {
       break;
     }
     case CliCmd::QUIT: {
-      // gửi QUIT và đóng kết nối
-      // send_line("QUIT\r\n"); 
+      
       disconnect();
       break;
     }
