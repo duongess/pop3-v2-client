@@ -40,7 +40,7 @@ std::string Client::request(const std::string& message) {
     }
     console.info("[TCP] Sent: ", message);
 
-    Response response = client.receiveData(65536);
+    Response response = client.receiveData();
     if (response.status == Status::OK) {
         console.info("[TCP] Received: ", response.data);
         return response.data;
