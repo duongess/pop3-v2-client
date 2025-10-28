@@ -1,5 +1,5 @@
 #pragma once
 
 namespace Config {
-    inline const int BUFFER_SIZE = 4096;
+    inline const int BUFFER_SIZE = 65536;
 }
