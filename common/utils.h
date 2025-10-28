@@ -60,9 +60,6 @@ extern const Console console;
 // ===== API =====
 bool net_init();
 
-// Trả về IP LAN nếu host là localhost/127.0.0.1/::1, ngược lại trả về host gốc
-std::string normalizeHostForLAN(std::string host);
-
 // Cấp phát addrinfo (nhớ free bằng freeaddrinfo)
 addrinfo* resolveAddress(const std::string& host, const std::string& port, bool passive);
 

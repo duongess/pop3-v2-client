@@ -11,51 +11,6 @@ bool net_init() {
 #endif
 }
 
-// Lấy IP LAN "chính" (không gửi gói nào thật)
-std::string getPrimaryIPv4() {
-#ifdef _WIN32
-  WSADATA wsa{}; WSAStartup(MAKEWORD(2,2), &wsa);
-#endif
-  int s = ::socket(AF_INET, SOCK_DGRAM, 0);
-  if (s < 0) throw std::runtime_error("socket failed");
-
-  sockaddr_in dst{};
-  dst.sin_family = AF_INET;
-  dst.sin_port = htons(80);
-  inet_pton(AF_INET, "8.8.8.8", &dst.sin_addr); // chỉ để kernel chọn route
-
-  ::connect(s, (sockaddr*)&dst, sizeof(dst)); // không gửi thật
-
-  sockaddr_in name{}; socklen_t len = sizeof(name);
-  ::getsockname(s, (sockaddr*)&name, &len);
-
-#ifdef _WIN32
-  closesocket(s); WSACleanup();
-#else
-  close(s);
-#endif
-
-  char buf[INET_ADDRSTRLEN] = {0};
-  inet_ntop(AF_INET, &name.sin_addr, buf, sizeof(buf));
-  return std::string(buf);
-}
-
-// Nếu host là localhost/loopback thì thay bằng IP LAN
-std::string normalizeHostForLAN(std::string host) {
-  auto lower = host;
-  for (auto& c : lower) c = (char)tolower((unsigned char)c);
-  if (lower == "localhost" || lower == "127.0.0.1" || lower == "::1") {
-    try {
-      return getPrimaryIPv4(); // ví dụ "192.168.1.23"
-    } catch (...) {
-      // fallback: vẫn trả 127.0.0.1 nếu không lấy được
-      return "127.0.0.1";
-    }
-  }
-  return host;
-}
-
-
 addrinfo* resolveAddress(const std::string& host, const std::string& port, bool passive) {
     addrinfo hints{};
     hints.ai_family = AF_INET; // IPv4 only; AF_UNSPEC nếu cần IPv6

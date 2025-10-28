@@ -4,10 +4,9 @@ Client::Client() : db() {
     db.initSchema();
     AccountState lastAcc = db.account.getLastAccount();
     if (lastAcc.username != "") {
-        this->username = lastAcc.username;
         this->host = lastAcc.host;
         this->port = lastAcc.port;
-        console.info("[DB] Loaded last account: ", this->username, "@", this->host, ":", this->port);
+        console.info("[DB] Loaded last account: ", lastAcc.username, "@", this->host, ":", this->port);
     } else {
         console.info("[DB] No previous account found.");
     }
@@ -80,45 +79,4 @@ std::string Client::responsePopv2(const std::string& message) {
   }
   console.warn("[POPv2] Unknown response: ", mess);
   return "";
-}
-
-void Client::sendPopv2(const std::string& message) {
-    RequestPopV2 p;
-    ParsedCommand pc = parseCliLine(message);
-    if (!pc.ok()) {
-        console.error(pc.error);
-        return;
-    }
-    switch (pc.cmd) {
-    case CliCmd::LOGIN: {
-      const LoginArgs& a = std::get<LoginArgs>(pc.payload);
-      this->host = a.host;
-      this->port = a.port;
-      this->responsePopv2(p.USER(a.user));
-      std::string token = this->responsePopv2(p.PASS(a.pass));
-      this->username = a.user;
-      if (token != "") {
-        this->token = token;
-        db.account.createAccount(a.user, normalizeHostForLAN(a.host), this->port);
-      }
-      else {
-        disconnect();
-      }
-
-      ;
-
-      break;
-    }
-    case CliCmd::SYNC: {
-      // gửi UIDL/LIST, đối sánh local, RETR các mail mới, lưu file, in số lượng
-      // sync_flow();
-      break;
-    }
-    case CliCmd::QUIT: {
-      
-      disconnect();
-      break;
-    }
-    default: break;
-  }
 }
