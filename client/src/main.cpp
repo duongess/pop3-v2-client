@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   if (argc >= 2) {
     host = argv[1];
   }
-
+  std::filesystem::create_directories("database");
   Client client;
   
   menuClient();

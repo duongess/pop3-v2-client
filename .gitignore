@@ -1,6 +1,7 @@
 /build/
 /out/
 /CMakeFiles/
+/database/
 /CMakeCache.txt
 /*.sln
 /*.vcxproj*
@@ -9,4 +10,3 @@
 *.log
 *.exe
 *.pdb
-*.db
