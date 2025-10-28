@@ -21,7 +21,6 @@ class Client {
         DB db;
         std::string request(const std::string& message);
         bool connect();
-        void disconnect();
     public:
         Client();
         void setIp(const std::string& host, const std::string& port) {
@@ -30,6 +29,7 @@ class Client {
         }
 
         bool isConnected();
+        void disconnect();
         std::string getUsername() const { return this->username; }
         std::string getHost() const { return this->host; }
         std::string getPort() const { return this->port; }
