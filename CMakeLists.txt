@@ -77,6 +77,8 @@ add_executable(client
   client/src/main.cpp
   client/src/client.cpp
   client/src/utils.cpp
+  client/src/cli.cpp
+  client/src/pop3-v2-cli.cpp
   common/protocol.cpp
   common/utils.cpp
 )

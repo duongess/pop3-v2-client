@@ -1,3 +1,6 @@
+#ifndef CLIENT_H
+#define CLIENT_H
+
 #include "common/utils.h"
 #include "utils.h"
 #include "common/protocol.h"
@@ -36,3 +39,5 @@ class Client {
 
         std::string responsePopv2(const std::string& message);
 };
+
+#endif
