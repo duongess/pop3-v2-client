@@ -15,6 +15,7 @@ class POP3V2ClientCLI: public CmdLineInterface{
 
     private:
         void doLogin(std::string cmd_argv[], int cmd_argc);
+        void doLogout(std::string cmd_argv[], int cmd_argc);
         void doSync(std::string cmd_argv[], int cmd_argc);
         void doHelp(std::string cmd_argv[], int cmd_argc);
         void doQuit(std::string cmd_argv[], int cmd_argc);

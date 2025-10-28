@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
   std::filesystem::create_directories("database");
   Client client;
   
-  menuClient();
   POP3V2ClientCLI cli;
   cli.initCmd();
   cli.run();
