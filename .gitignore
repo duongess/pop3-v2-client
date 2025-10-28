@@ -1,5 +1,4 @@
 /build/
-/database/
 /out/
 /CMakeFiles/
 /CMakeCache.txt
@@ -10,3 +9,4 @@
 *.log
 *.exe
 *.pdb
+*.db
