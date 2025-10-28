@@ -49,13 +49,26 @@ void POP3V2ClientCLI::doLogout(std::string cmd_argv[], int cmd_argc) {
 }
 
 void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
-    // Implementation of sync command
+
+    
+    console.log("Synchronizing emails...\n");
+    std::string response = this->pop3Client.responsePopv2("LIST");
+    if (response == "") {
+        console.error("Failed to retrieve email list.\n");
+        return;
+    }
+    std::vector<MailInfo> emails = parseJsonWithoutLibrary(response);
+    for (const auto& email : emails) {
+        console.log("Email ID: ", email.mailId, "\n");
+        console.log("UIDL: ", email.uidl, "\n");
+        console.log("Size: ", email.size, "\n");
+    }
 }
 
 void POP3V2ClientCLI::doHelp(std::string cmd_argv[], int cmd_argc) {
     console.log("Available commands:\n");
     console.log("  login <host>:<port> <username> <password> - Log in to the POP3v2 server\n");
-    console.log("  logout - disconnect to the POP3v2 server");
+    console.log("  logout - disconnect to the POP3v2 server\n");
     console.log("  sync - Synchronize emails\n");
     console.log("  help - Show this help message\n");
     console.log("  quit - Exit the CLI\n");
