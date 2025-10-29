@@ -1,17 +1,5 @@
 #include "client.h"
 
-Client::Client() : db() {
-    db.initSchema();
-    AccountState lastAcc = db.account.getLastAccount();
-    if (lastAcc.username != "") {
-        this->host = lastAcc.host;
-        this->port = lastAcc.port;
-        console.info("[DB] Loaded last account: ", lastAcc.username, "@", this->host, ":", this->port);
-    } else {
-        console.info("[DB] No previous account found.");
-    }
-}
-
 bool Client::connect() {
     if (client.isConnected()) return true;
     if (!client.connectTo(host, port)) {

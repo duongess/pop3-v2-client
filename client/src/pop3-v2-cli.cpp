@@ -1,10 +1,18 @@
 #include "pop3-v2-cli.h"
 
 
-POP3V2ClientCLI::POP3V2ClientCLI():CmdLineInterface("pop3-v2-cli> ")
+POP3V2ClientCLI::POP3V2ClientCLI():CmdLineInterface("pop3-v2-cli> "),db()
 {
     this->hostname = "";
     this->user = "";
+    db.initSchema();
+    AccountState lastAcc = db.account.getLastAccount();
+    if (lastAcc.username != "") {
+        this->hostname =  lastAcc.host + ":" + lastAcc.port;
+        console.info("[DB] Loaded last account: ", lastAcc.username, "@", this->hostname);
+    } else {
+        console.info("[DB] No previous account found.");
+    }
 }
 
 void POP3V2ClientCLI::initCmd() {
@@ -60,6 +68,9 @@ void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
         console.log("Email ID: ", email.mailId, "\n");
         console.log("Size: ", email.size, "\n");
     }
+    db.email.saveEmail(emails);
+
+
 }
 
 void POP3V2ClientCLI::doHelp(std::string cmd_argv[], int cmd_argc) {

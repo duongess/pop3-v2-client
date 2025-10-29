@@ -3,7 +3,7 @@
 
 #include "cli.h"
 #include "client.h"
-
+#include "db.h"
 class POP3V2ClientCLI: public CmdLineInterface{
     public:
         Client pop3Client;
@@ -14,6 +14,7 @@ class POP3V2ClientCLI: public CmdLineInterface{
         std::string user;
 
     private:
+        DB db ;
         void doLogin(std::string cmd_argv[], int cmd_argc);
         void doLogout(std::string cmd_argv[], int cmd_argc);
         void doSync(std::string cmd_argv[], int cmd_argc);
