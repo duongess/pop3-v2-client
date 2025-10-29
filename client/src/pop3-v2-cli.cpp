@@ -49,8 +49,6 @@ void POP3V2ClientCLI::doLogout(std::string cmd_argv[], int cmd_argc) {
 }
 
 void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
-
-    
     console.log("Synchronizing emails...\n");
     std::string response = this->pop3Client.responsePopv2("LIST");
     if (response == "") {

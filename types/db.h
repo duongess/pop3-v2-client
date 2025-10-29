@@ -21,7 +21,6 @@ struct Mail {
 // Simple metadata returned for LIST command
 struct MailInfo {
     int mailId;
-    std::string uidl;
     size_t size;
 };
 
