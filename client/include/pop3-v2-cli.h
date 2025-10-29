@@ -11,7 +11,8 @@ class POP3V2ClientCLI: public CmdLineInterface{
         virtual void initCmd();
     protected:
         std::string hostname;
-        std::string user;
+        std::string username;
+        ssize_t accountId;
 
     private:
         DB db ;

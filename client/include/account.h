@@ -7,6 +7,6 @@ public:
 
     bool createTableIfNeeded() override;
 
-    bool createAccount(const std::string& username, const std::string& host, const std::string& port);
+    ssize_t setAccount(const std::string& username, const std::string& host, const std::string& port);
     AccountState getLastAccount();
 };

@@ -4,7 +4,7 @@
 POP3V2ClientCLI::POP3V2ClientCLI():CmdLineInterface("pop3-v2-cli> "),db()
 {
     this->hostname = "";
-    this->user = "";
+    this->username = "";
     db.initSchema();
     AccountState lastAcc = db.account.getLastAccount();
     if (lastAcc.username != "") {
@@ -44,8 +44,9 @@ void POP3V2ClientCLI::doLogin(std::string cmd_argv[], int cmd_argc) {
         return;
     }
     this->hostname = cmd_argv[1];
-    this->user = cmd_argv[2];
-    setCmdPrompt(hostname + "@" + user + "> ");
+    this->username = cmd_argv[2];
+    this->accountId = db.account.setAccount(username, host, port);
+    setCmdPrompt(hostname + "@" + username + "> ");
 }
 
 void POP3V2ClientCLI::doLogout(std::string cmd_argv[], int cmd_argc) {

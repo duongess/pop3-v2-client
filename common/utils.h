@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <filesystem>
+#include <optional>
 #include <memory>
 #include <atomic>
 #include <mutex>
