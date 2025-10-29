@@ -12,11 +12,9 @@ class Client {
         std::string host;
         std::string port;
         Protocol client;
-        DB db;
         std::string request(const std::string& message);
         bool connect();
     public:
-        Client();
         void setIp(const std::string& host, const std::string& port) {
             this->host = host;
             this->port = port;

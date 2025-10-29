@@ -66,6 +66,7 @@ add_library(state
   client/src/state/dbConnection.cpp
   client/src/state/table.cpp
   client/src/state/account.cpp
+  client/src/state/email.cpp
 )
 target_include_directories(state PUBLIC
   ${ROOT_DIR}/client/src/state
