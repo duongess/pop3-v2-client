@@ -55,10 +55,9 @@ void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
         console.error("Failed to retrieve email list.\n");
         return;
     }
-    std::vector<MailInfo> emails = parseJsonWithoutLibrary(response);
+    std::vector<MailInfo> emails = tranferMail(response);
     for (const auto& email : emails) {
         console.log("Email ID: ", email.mailId, "\n");
-        console.log("UIDL: ", email.uidl, "\n");
         console.log("Size: ", email.size, "\n");
     }
 }
