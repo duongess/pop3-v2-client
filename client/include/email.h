@@ -5,6 +5,6 @@ class EmailTable: public Table{
 public:
 using Table::Table;
 bool createTableIfNeeded() override;
-bool saveEmail(std::vector<MailInfo>emails);
+bool saveEmail(int64_t accountId, const std::vector<MailInfo>& emails);
 
 };

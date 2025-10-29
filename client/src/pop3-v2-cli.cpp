@@ -69,7 +69,7 @@ void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
         console.log("Email ID: ", email.mailId, "\n");
         console.log("Size: ", email.size, "\n");
     }
-    db.email.saveEmail(emails);
+    db.email.saveEmail(accountId, emails);
 
 
 }
