@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "tcpclient.h"
 #include "cli.h"
 #include "db.h"
