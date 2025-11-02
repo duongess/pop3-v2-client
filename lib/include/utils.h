@@ -25,3 +25,6 @@ extern const Console console;
 
 #include "types/state.h"
 std::string convertToString(std::vector<MailInfo> mails);
+std::vector<MailInfo> convertToMails(const std::string& mailString);
+
+bool checkAndTrimPrefix(std::string& s, const std::string& pfx);

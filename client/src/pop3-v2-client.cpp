@@ -1,22 +1,5 @@
 #include "pop3-v2-client.h"
 
-static bool checkAndTrimPrefix(std::string& s, const std::string& pfx) {
-    // 1. Dùng s.find() thay cho rfind(), dễ đọc hơn
-    if (s.find(pfx) != 0) {
-        return false; // Không khớp, không làm gì cả
-    }
-
-    // 2. Khớp! Cắt bỏ prefix
-    s = s.substr(pfx.size());
-
-    // 3. *An toàn* cắt bỏ dấu cách ở đầu (nếu có)
-    if (!s.empty() && s[0] == ' ') {
-        s = s.substr(1);
-    }
-
-    return true;
-}
-
 std::string Pop3V2Client::getSingleLineResponse(std::string mess) {
     console.debug("client: " + mess);
     if (this->sendStringRequest(mess + "\r\n") < 0) {
@@ -59,8 +42,7 @@ std::string Pop3V2Client::getSingleLineResponse(std::string mess) {
 std::string Pop3V2Client::getMultiLineResponse(std::string mess) {
     // 1. Gửi lệnh
     if (this->sendStringRequest(mess + "\r\n") < 0) {
-        this->close();
-        return "";
+        throw SocketException("Failed to send command: " + mess);
     }
 
     char buff[1024];
@@ -69,42 +51,48 @@ std::string Pop3V2Client::getMultiLineResponse(std::string mess) {
     // 2. Đọc dòng phản hồi đầu tiên (+OK hoặc -ERR)
     int len = this->recvGetLine(buff, sizeof(buff) - 1);
     if (len <= 0) {
-        this->close();
-        return "";
+        throw SocketException("Server disconnected or failed to respond.");
     }
     buff[len] = '\0';
     
     std::string firstLine = buff;
-    // Nếu dòng đầu là lỗi (-ERR), trả về ngay
-    if (firstLine.substr(0, 4) == "-ERR") {
-        return firstLine; 
+    // // Xóa \r\n
+    // if (!firstLine.empty() && firstLine.back() == '\n') firstLine.pop_back();
+    // if (!firstLine.empty() && firstLine.back() == '\r') firstLine.pop_back();
+
+    // 3. Kiểm tra dòng đầu tiên
+    // Nếu là -ERR, ném lỗi với nội dung
+    if (checkAndTrimPrefix(firstLine, "-ERR")) {
+        throw SocketException(firstLine); 
     }
 
-    // 3. Vòng lặp để đọc data cho đến khi gặp "."
+    // Nếu không phải +OK, đây là một lỗi giao thức không mong muốn
+    if (!checkAndTrimPrefix(firstLine, "+OK")) {
+        throw SocketException("Unexpected server response: " + firstLine);
+    }
+
+    // 4. Vòng lặp để đọc data cho đến khi gặp "."
     while (true) {
         len = this->recvGetLine(buff, sizeof(buff) - 1);
         if (len <= 0) {
-            this->close(); // Lỗi, server ngắt kết nối giữa chừng
-            return ""; 
+            throw SocketException("Server disconnected during multi-line response.");
         }
         buff[len] = '\0';
 
         // Kiểm tra điều kiện dừng: dòng chỉ có dấu "."
-        // (Một số server gửi ".\r\n", số khác gửi ".")
-        if (strcmp(buff, ".\r\n") == 0 || strcmp(buff, ".") == 0) {
-            break; // Kết thúc thành công
+        if (strcmp(buff, ".\r\n") == 0 || strcmp(buff, ".\n") == 0 || strcmp(buff, ".") == 0) {
+            break;
         }
 
-        // Nếu dòng data bắt đầu bằng 2 dấu chấm (byte-stuffing)
-        // thì bỏ bớt 1 dấu
+        // 5. Xử lý "byte-stuffing"
         if (buff[0] == '.' && buff[1] == '.') {
             receive += (buff + 1); // Nối chuỗi bắt đầu từ ký tự thứ 2
         } else {
-            receive += buff; // Nối toàn bộ dòng vào kết quả
+            receive += (buff + std::string("\r\n"));
         }
     }
     
-    return receive; // Trả về toàn bộ nội dung đã nhận
+    return receive;
 }
 
 Pop3V2Client::Pop3V2Client():CmdLineInterface("pop3-v2-cli> "),db()
@@ -188,18 +176,24 @@ void Pop3V2Client::doLogout(std::string cmd_argv[], int cmd_argc) {
 }
 
 void Pop3V2Client::doSync(std::string cmd_argv[], int cmd_argc) {
-    console.log("Synchronizing emails...\n");
-    int response = this->sendStringRequest("LIST\r\n");
-    if (response < 0) {
-        console.error("Failed to retrieve email list.\n");
+    if (!isConnected()) {
+        console.error("Not logged in.");
         return;
     }
-    // std::vector<MailInfo> emails = tranferMail(response);
-    // for (const auto& email : emails) {
-    //     console.log("Email ID: ", email.mailId, "\n");
-    //     console.log("Size: ", email.size, "\n");
-    // }
-    // db.email.saveEmail(accountId, emails);
+
+    try {
+        std::string response = this->getMultiLineResponse("LIST");
+        console.log("--- Mail List ---\n");
+        std::vector<MailInfo> emails = convertToMails(response);
+        for (const MailInfo& email : emails) {
+            console.log("Email ID: ", email.mailId, "\n");
+            console.log("Size: ", email.size, "\n");
+        }
+        db.email.saveEmail(accountId, emails);
+
+    } catch (SocketException &e) {
+        console.error("Could not get list: " + std::string(e.what()));
+    }
 }
 
 void Pop3V2Client::doHelp(std::string cmd_argv[], int cmd_argc) {
