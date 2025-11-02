@@ -12,7 +12,9 @@ private:
     std::string hostname;
     std::string username;
     ssize_t accountId;
-    std::string sendPop3V2(std::string mess);
+
+    std::string getSingleLineResponse(std::string mess);
+    std::string getMultiLineResponse(std::string mess);
 
     DB db;
     void doLogin(std::string cmd_argv[], int cmd_argc);

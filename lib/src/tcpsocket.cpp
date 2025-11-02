@@ -15,7 +15,6 @@ typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
 #include <cstring>
-#include <iostream>
 #include <errno.h>             // For errno
 #include "tcpsocket.h"
 void fillAddr(const std::string&,unsigned short, sockaddr_in&);
@@ -281,36 +280,15 @@ int TcpSocket::recvLine(char* buffer, int bufLen)
 {
     int total_byte_recv = 0;
     int byte_recv;
-    std::cout << "recv client" << std::endl;
     byte_recv = ::recv(sockDesc, buffer+total_byte_recv, 1, 0);
-    while(byte_recv > 0)
+    while(byte_recv>0)
     {
         total_byte_recv += byte_recv;
-
-        // ----- PHẦN DEBUG MỚI -----
-        // Lấy ký tự cuối cùng vừa nhận được
-        char kyTuVuaNhan = buffer[total_byte_recv - 1];
-
-        if (kyTuVuaNhan == '\r') {
-            std::cout << "DEBUG: Nhận được [\\r]" << std::endl;
-        } else if (kyTuVuaNhan == '\n') {
-            std::cout << "DEBUG: Nhận được [\\n]" << std::endl;
-        } else {
-            // In ký tự bình thường
-            std::cout << "DEBUG: Nhận được ['" << kyTuVuaNhan << "'] (Total: " << total_byte_recv << ")" << std::endl;
-        }
-        // ----- KẾT THÚC DEBUG -----
-
-        // Điều kiện thoát (giữ nguyên)
-        if(total_byte_recv >= 2 && buffer[total_byte_recv-1] == '\n' && buffer[total_byte_recv-2] == '\r')
+        if(total_byte_recv>=2 && buffer[total_byte_recv-1]=='\n'&& buffer[total_byte_recv-2]=='\r')
             break;
-        if(total_byte_recv >= bufLen - 1)
+        if(total_byte_recv>=bufLen-1)
             break;
-
-        // Đọc ký tự tiếp theo
-        byte_recv = ::recv(sockDesc, buffer + total_byte_recv, 1, 0);
-        
-        // Bỏ dòng std::cout cũ của bạn ở đây
+        byte_recv = ::recv(sockDesc,buffer+total_byte_recv, 1, 0);
     }
     if(byte_recv==0)
     {
