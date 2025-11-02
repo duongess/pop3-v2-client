@@ -1,13 +1,7 @@
 #include "pop3-v2-client.h"
 
-std::string Pop3V2Client::getSingleLineResponse(std::string mess) {
-    console.debug("client: " + mess);
-    if (this->sendStringRequest(mess + "\r\n") < 0) {
-        throw SocketException("Failed to send command: " + mess);
-    }
-
+std::string Pop3V2Client::response() {
     char buff[1024];
-    
     // Chỉ đọc 1 dòng
     int len = this->recvGetLine(buff, sizeof(buff) - 1);
     
@@ -39,7 +33,16 @@ std::string Pop3V2Client::getSingleLineResponse(std::string mess) {
     return response; 
 }
 
-std::string Pop3V2Client::getMultiLineResponse(std::string mess) {
+std::string Pop3V2Client::getSingleLineResponse(const std::string& mess) {
+    console.debug("client: " + mess);
+    if (this->sendStringRequest(mess + "\r\n") < 0) {
+        throw SocketException("Failed to send command: " + mess);
+    }
+
+    return this->response();
+}
+
+std::string Pop3V2Client::getMultiLineResponse(const std::string& mess) {
     // 1. Gửi lệnh
     if (this->sendStringRequest(mess + "\r\n") < 0) {
         throw SocketException("Failed to send command: " + mess);
@@ -110,6 +113,11 @@ Pop3V2Client::Pop3V2Client():CmdLineInterface("pop3-v2-cli> "),db()
     }
 }
 
+void Pop3V2Client::connect(const std::string& serverHost, const std::string& port) {
+    this->open(serverHost, port); 
+    this->response();
+}
+
 void Pop3V2Client::initCmd() {
     addCmd("login", CLI_CAST(&Pop3V2Client::doLogin));
     addCmd("logout", CLI_CAST(&Pop3V2Client::doLogout));
@@ -145,7 +153,7 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
     // Bắt đầu khối try để bắt các lỗi SocketException
     try {
         // 1. Mở kết nối
-        this->open(host, port); 
+        this->connect(host, port); 
 
         // 2. Gửi USER
         this->getSingleLineResponse("USER " + cmd_argv[2]);
