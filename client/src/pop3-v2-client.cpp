@@ -1,7 +1,6 @@
-#include "pop3-v2-cli.h"
+#include "pop3-v2-client.h"
 
-
-POP3V2ClientCLI::POP3V2ClientCLI():CmdLineInterface("pop3-v2-cli> "),db()
+Pop3V2Client::Pop3V2Client():CmdLineInterface("pop3-v2-cli> "),db()
 {
     this->hostname = "";
     this->username = "";
@@ -15,15 +14,15 @@ POP3V2ClientCLI::POP3V2ClientCLI():CmdLineInterface("pop3-v2-cli> "),db()
     }
 }
 
-void POP3V2ClientCLI::initCmd() {
-    addCmd("login", CLI_CAST(&POP3V2ClientCLI::doLogin));
-    addCmd("logout", CLI_CAST(&POP3V2ClientCLI::doLogout));
-    addCmd("sync", CLI_CAST(&POP3V2ClientCLI::doSync));
-    addCmd("help", CLI_CAST(&POP3V2ClientCLI::doHelp));
-    addCmd("quit", CLI_CAST(&POP3V2ClientCLI::doQuit));
+void Pop3V2Client::initCmd() {
+    addCmd("login", CLI_CAST(&Pop3V2Client::doLogin));
+    addCmd("logout", CLI_CAST(&Pop3V2Client::doLogout));
+    addCmd("sync", CLI_CAST(&Pop3V2Client::doSync));
+    addCmd("help", CLI_CAST(&Pop3V2Client::doHelp));
+    addCmd("quit", CLI_CAST(&Pop3V2Client::doQuit));
 }
 
-void POP3V2ClientCLI::doLogin(std::string cmd_argv[], int cmd_argc) {
+void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
     if (cmd_argc > 4) {
         console.error("Usage: login <host>:<port> <username> <password>");
         console.log("Run 'help' for more information\n");
@@ -49,7 +48,7 @@ void POP3V2ClientCLI::doLogin(std::string cmd_argv[], int cmd_argc) {
     setCmdPrompt(hostname + "@" + username + "> ");
 }
 
-void POP3V2ClientCLI::doLogout(std::string cmd_argv[], int cmd_argc) {
+void Pop3V2Client::doLogout(std::string cmd_argv[], int cmd_argc) {
     if(this->pop3Client.isConnected()) {
         console.log("Disconnecting...\n");
         this->pop3Client.disconnect();
@@ -57,7 +56,7 @@ void POP3V2ClientCLI::doLogout(std::string cmd_argv[], int cmd_argc) {
     setCmdPrompt("pop3-v2-cli> ");
 }
 
-void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
+void Pop3V2Client::doSync(std::string cmd_argv[], int cmd_argc) {
     console.log("Synchronizing emails...\n");
     std::string response = this->pop3Client.responsePopv2("LIST");
     if (response == "") {
@@ -74,7 +73,7 @@ void POP3V2ClientCLI::doSync(std::string cmd_argv[], int cmd_argc) {
 
 }
 
-void POP3V2ClientCLI::doHelp(std::string cmd_argv[], int cmd_argc) {
+void Pop3V2Client::doHelp(std::string cmd_argv[], int cmd_argc) {
     console.log("Available commands:\n");
     console.log("  login <host>:<port> <username> <password> - Log in to the POP3v2 server\n");
     console.log("  logout - disconnect to the POP3v2 server\n");
@@ -83,7 +82,7 @@ void POP3V2ClientCLI::doHelp(std::string cmd_argv[], int cmd_argc) {
     console.log("  quit - Exit the CLI\n");
 }
 
-void POP3V2ClientCLI::doQuit(std::string cmd_argv[], int cmd_argc) {
+void Pop3V2Client::doQuit(std::string cmd_argv[], int cmd_argc) {
     this->doLogout(cmd_argv, cmd_argc);
     std::exit(0);
 }

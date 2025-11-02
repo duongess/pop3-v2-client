@@ -16,3 +16,8 @@ struct EmailState {
     std::string body;
     ssize_t receivedAt;
 };
+
+struct MailInfo {
+    int mailId;
+    size_t size;
+};

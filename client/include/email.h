@@ -1,6 +1,5 @@
 #pragma once
 #include "table.h"
-#include "types/db.h"
 class EmailTable: public Table{
 public:
 using Table::Table;
