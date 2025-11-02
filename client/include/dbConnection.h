@@ -1,6 +1,6 @@
 #pragma once
 #include "sqlite3.h"
-#include "../../common/utils.h"
+#include "utils.h"
 
 class DbConnection {
 public:

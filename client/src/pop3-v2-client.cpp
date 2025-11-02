@@ -1,10 +1,15 @@
 #include "pop3-v2-client.h"
 
+std::string Pop3V2Client::sendPop3V2(std::string mess) {
+
+}
+
 Pop3V2Client::Pop3V2Client():CmdLineInterface("pop3-v2-cli> "),db()
 {
     this->hostname = "";
     this->username = "";
     db.initSchema();
+    this->initCmd();
     AccountState lastAcc = db.account.getLastAccount();
     if (lastAcc.username != "") {
         this->hostname =  lastAcc.host + ":" + lastAcc.port;
@@ -33,13 +38,13 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
     std::getline(ss, host, ':');
     std::getline(ss, port, ':');
 
-    this->pop3Client.setIp(host, port);
-    if (this->pop3Client.responsePopv2("USER " + cmd_argv[2]) == "") {
-        this->pop3Client.disconnect();
+    this->open(host, port);
+    if (this->sendStringRequest("USER " + cmd_argv[2] + "\r\n") < 0) {
+        this->close();
         return;
     };
-    if (this->pop3Client.responsePopv2("PASS " + cmd_argv[3]) == "") {
-        this->pop3Client.disconnect();
+    if (this->sendStringRequest("PASS " + cmd_argv[3] + "\r\n") < 0) {
+        this->close();
         return;
     }
     this->hostname = cmd_argv[1];
@@ -49,28 +54,26 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
 }
 
 void Pop3V2Client::doLogout(std::string cmd_argv[], int cmd_argc) {
-    if(this->pop3Client.isConnected()) {
+    if(this->isConnected()) {
         console.log("Disconnecting...\n");
-        this->pop3Client.disconnect();
+        this->close();
     } 
     setCmdPrompt("pop3-v2-cli> ");
 }
 
 void Pop3V2Client::doSync(std::string cmd_argv[], int cmd_argc) {
     console.log("Synchronizing emails...\n");
-    std::string response = this->pop3Client.responsePopv2("LIST");
-    if (response == "") {
+    int response = this->sendStringRequest("LIST\r\n");
+    if (response < 0) {
         console.error("Failed to retrieve email list.\n");
         return;
     }
-    std::vector<MailInfo> emails = tranferMail(response);
-    for (const auto& email : emails) {
-        console.log("Email ID: ", email.mailId, "\n");
-        console.log("Size: ", email.size, "\n");
-    }
-    db.email.saveEmail(accountId, emails);
-
-
+    // std::vector<MailInfo> emails = tranferMail(response);
+    // for (const auto& email : emails) {
+    //     console.log("Email ID: ", email.mailId, "\n");
+    //     console.log("Size: ", email.size, "\n");
+    // }
+    // db.email.saveEmail(accountId, emails);
 }
 
 void Pop3V2Client::doHelp(std::string cmd_argv[], int cmd_argc) {

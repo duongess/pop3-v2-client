@@ -82,8 +82,8 @@ add_executable(client
     ${CLIENT_SOURCES}
     ${LIB_SOURCES}
 )
-# Server link đến storage và NetworkSystem_Headers
-target_link_libraries(client PRIVATE storage NetworkSystem_Headers)
+# Server link đến state và NetworkSystem_Headers
+target_link_libraries(client PRIVATE state NetworkSystem_Headers)
 
 
 # =================================================================================
