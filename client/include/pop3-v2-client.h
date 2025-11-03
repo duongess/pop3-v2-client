@@ -14,7 +14,7 @@ private:
     ssize_t accountId;
     void connect(const std::string& serverHost, const std::string& port);
 
-    std::string response();
+    std::string responseMess();
     std::string getSingleLineResponse(const std::string& mess);
     std::string getMultiLineResponse(const std::string& mess);
 

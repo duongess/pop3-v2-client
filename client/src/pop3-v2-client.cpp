@@ -1,6 +1,6 @@
 #include "pop3-v2-client.h"
 
-std::string Pop3V2Client::response() {
+std::string Pop3V2Client::responseMess() {
     char buff[1024];
     // Chỉ đọc 1 dòng
     int len = this->recvGetLine(buff, sizeof(buff) - 1);
@@ -39,7 +39,7 @@ std::string Pop3V2Client::getSingleLineResponse(const std::string& mess) {
         throw SocketException("Failed to send command: " + mess);
     }
 
-    return this->response();
+    return this->responseMess();
 }
 
 std::string Pop3V2Client::getMultiLineResponse(const std::string& mess) {
@@ -115,7 +115,7 @@ Pop3V2Client::Pop3V2Client():CmdLineInterface("pop3-v2-cli> "),db()
 
 void Pop3V2Client::connect(const std::string& serverHost, const std::string& port) {
     this->open(serverHost, port); 
-    this->response();
+    this->responseMess();
 }
 
 void Pop3V2Client::initCmd() {
