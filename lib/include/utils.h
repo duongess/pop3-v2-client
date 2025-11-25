@@ -19,7 +19,11 @@
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
+#ifndef _UTILS_H_
+#define _UTILS_H_
 
+#include <string>
+#include <vector>
 #include "console.h"
 extern const Console console;
 
@@ -28,3 +32,8 @@ std::string convertToString(std::vector<MailInfo> mails);
 std::vector<MailInfo> convertToMails(const std::string& mailString);
 
 bool checkAndTrimPrefix(std::string& s, const std::string& pfx);
+bool isIpAddress(const std::string& str); // Kiểm tra chuỗi có phải IP không
+std::string resolveHostname(const std::string& hostname); // Phân giải tên miền ra IP
+void logDisconnectError(); // In thông báo mất kết nối
+
+#endif // _UTILS_H_
