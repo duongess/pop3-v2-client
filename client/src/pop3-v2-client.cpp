@@ -160,10 +160,11 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
 
         // 3. Gửi PASS
         this->getSingleLineResponse("PASS " + cmd_argv[3]);
-        std::string connectIp,displayHost;
         this->hostname = cmd_argv[1];
         this->username = cmd_argv[2];
         this->accountId = db.account.setAccount(username, host, port);
+        std::string connectIp,displayHost = host + ":" + port;
+
         if (!isIpAddress(host)) {
             // Case 1: Nhập Hostname -> Tìm IP -> Lưu DB
             std::string ip = resolveHostname(host);
@@ -180,7 +181,7 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
         }
 
         // Lúc hiển thị prompt:
-        setCmdPrompt("join: " + displayHost + "@" + username + "> ");
+        setCmdPrompt(username + "@" + displayHost + "> ");
          
         console.log("Login successful. Welcome " + this->username + "!\n");
 
