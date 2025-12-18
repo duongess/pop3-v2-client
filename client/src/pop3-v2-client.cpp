@@ -188,7 +188,9 @@ void Pop3V2Client::doLogin(std::string cmd_argv[], int cmd_argc) {
     } catch (SocketException &e) {
         // 5. Bắt tất cả các lỗi có thể xảy ra
         console.error("Login failed: " + std::string(e.what()));
-        this->close();
+        console.error("Remote server closed the connection unexpectedly");
+        this->doLogout(nullptr, 0); // Reset trạng thái prompt về "pop3-v2-cli> "
+       
     }
 }
 
@@ -218,6 +220,8 @@ void Pop3V2Client::doSync(std::string cmd_argv[], int cmd_argc) {
 
     } catch (SocketException &e) {
         console.error("Could not get list: " + std::string(e.what()));
+        console.error("Remote server closed the connection unexpectedly");
+        this->doLogout(nullptr, 0); // Reset trạng thái prompt về "pop3-v2-cli> "
     }
 }
 
