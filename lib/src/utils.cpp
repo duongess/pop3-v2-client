@@ -14,7 +14,7 @@
 std::string convertToString(std::vector<MailInfo> mails){
     std::string cur = "";
     for (MailInfo mail:mails) {
-        cur += std::to_string(mail.mailId) + " " + std::to_string(mail.size) + "\r\n";
+        cur += std::to_string(mail.mailId) + " " + mail.header + "\r\n";
     }
     cur += "\r\n";
     console.debug(cur);
@@ -24,12 +24,30 @@ std::string convertToString(std::vector<MailInfo> mails){
 std::vector<MailInfo> convertToMails(const std::string& mailString) {
     std::vector<MailInfo> result;
     std::istringstream iss(mailString);
-    int id, size;
-    while (iss >> id >> size) {
-        MailInfo mail;
-        mail.mailId = id;
-        mail.size = size;
-        result.push_back(mail);
+    std::string line;
+
+    while (std::getline(iss, line)) {
+        if (line.empty()) continue;
+
+        std::istringstream lineStream(line);
+        int id;
+
+        if (lineStream >> id) {
+            std::string header;
+            std::getline(lineStream, header);
+
+            size_t firstChar = header.find_first_not_of(" \t");
+            if (firstChar != std::string::npos) {
+                header = header.substr(firstChar);
+            } else {
+                header = "";
+            }
+
+            MailInfo mail;
+            mail.mailId = id;
+            mail.header = header;
+            result.push_back(mail);
+        }
     }
     return result;
 }

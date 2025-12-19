@@ -7,7 +7,7 @@ bool EmailTable::createTableIfNeeded() {
         "CREATE TABLE IF NOT EXISTS Mail ("
         "  accountId INTEGER NOT NULL,"
         "  mailId    INTEGER NOT NULL,"
-        "  size      INTEGER NOT NULL,"
+        "  header    TEXT NOT NULL,"
         "  PRIMARY KEY (accountId, mailId),"
         "  FOREIGN KEY (accountId) "
         "    REFERENCES Account(accountId)"
@@ -32,12 +32,12 @@ bool EmailTable::saveEmail(int64_t accountId, const std::vector<MailInfo>& email
     rc = sqlite3_exec(conn_.get(), "BEGIN IMMEDIATE;", nullptr, nullptr, &errMsg);
     if (rc != SQLITE_OK) { sqlite3_free(errMsg); return false; }
 
-    // UPSERT: cập nhật size nếu đã tồn tại
+    // UPSERT: cập nhật header nếu đã tồn tại
     static const char* SQL =
-        "INSERT INTO Mail (accountId, mailId, size) "
+        "INSERT INTO Mail (accountId, mailId, header) "
         "VALUES (?, ?, ?) "
         "ON CONFLICT(accountId, mailId) DO UPDATE SET "
-        "  size = excluded.size;";
+        "  header = excluded.header;";
 
     sqlite3_stmt* st = nullptr;
     if (sqlite3_prepare_v2(conn_.get(), SQL, -1, &st, nullptr) != SQLITE_OK) {
@@ -51,7 +51,7 @@ bool EmailTable::saveEmail(int64_t accountId, const std::vector<MailInfo>& email
 
         sqlite3_bind_int64(st, 1, accountId);
         sqlite3_bind_int64(st, 2, static_cast<long long>(m.mailId));
-        sqlite3_bind_int64(st, 3, static_cast<long long>(m.size));
+        sqlite3_bind_text(st, 3, m.header.c_str(), -1, SQLITE_STATIC);
 
         rc = sqlite3_step(st);
         if (rc != SQLITE_DONE) {

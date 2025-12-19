@@ -214,7 +214,7 @@ void Pop3V2Client::doSync(std::string cmd_argv[], int cmd_argc) {
         std::vector<MailInfo> emails = convertToMails(response);
         for (const MailInfo& email : emails) {
             console.log("Email ID: ", email.mailId, "\n");
-            console.log("Size: ", email.size, "\n");
+            console.log("Header: ", email.header, "\n");
         }
         db.email.saveEmail(accountId, emails);
 

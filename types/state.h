@@ -19,5 +19,5 @@ struct EmailState {
 
 struct MailInfo {
     int mailId;
-    size_t size;
+    std::string header;
 };
