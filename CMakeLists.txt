@@ -52,38 +52,37 @@ add_library(NetworkSystem_Headers INTERFACE)
 target_include_directories(NetworkSystem_Headers INTERFACE
     ${ROOT_DIR}
     # Thêm các thư mục include chính của Server/Client để dễ gọi header
-    ${ROOT_DIR}/client/include 
+    ${ROOT_DIR}/client/include
+    ${ROOT_DIR}/lib/include
 )
 
 
 # =================================================================================
-# 3. STATE LAYERS (Link với NetworkSystem_Headers)
+# 3. STORAGE/STATE LAYERS (Link với NetworkSystem_Headers)
 # =================================================================================
 
-# ====== State layer (Client) ======
+# ====== Storage layer ======
+file(GLOB_RECURSE STORAGE_SOURCES "client/src/state/*.cpp")
 add_library(state
-  client/src/state/db.cpp
-  client/src/state/dbConnection.cpp
-  client/src/state/table.cpp
-  client/src/state/account.cpp
-  client/src/state/email.cpp
+  ${STORAGE_SOURCES}
 )
 target_include_directories(state PUBLIC
-  ${ROOT_DIR}/client/src/state
+  ${ROOT_DIR}/client/src/state 
 )
 target_link_libraries(state PUBLIC sqlite3_vendor NetworkSystem_Headers)
 
-# ====== Client EXECUTABLE ======
+# =================================================================================
+# 4. CLIENT EXECUTABLE
+# =================================================================================
+
+# ====== Server ======
+file(GLOB_RECURSE CLIENT_SOURCES "client/src/*.cpp")
+file(GLOB LIB_SOURCES "lib/src/*.cpp")
 add_executable(client
-  client/src/main.cpp
-  client/src/client.cpp
-  client/src/utils.cpp
-  client/src/cli.cpp
-  client/src/pop3-v2-cli.cpp
-  common/protocol.cpp
-  common/utils.cpp
+    ${CLIENT_SOURCES}
+    ${LIB_SOURCES}
 )
-# Client link đến state và NetworkSystem_Headers
+# Server link đến state và NetworkSystem_Headers
 target_link_libraries(client PRIVATE state NetworkSystem_Headers)
 
 

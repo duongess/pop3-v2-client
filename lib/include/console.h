@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <utility>
-#include "../types/color.h"
+#include "types/color.h"
 
 
 class Console {

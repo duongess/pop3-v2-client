@@ -1,4 +1,5 @@
 #include "account.h"
+#include <iostream>
 
 bool AccountTable::createTableIfNeeded() {
     static const char* sql =
@@ -65,3 +66,35 @@ AccountState AccountTable::getLastAccount() {
     sqlite3_finalize(st);
     return account;
 } 
+
+
+void AccountTable::saveHost(const std::string& hostname, const std::string& ip) {
+    if (hostname.empty() || ip.empty()) return;
+
+    // Dùng REPLACE để cập nhật nếu IP đã tồn tại
+    std::string sql = "INSERT OR REPLACE INTO hosts (ip, hostname) VALUES ('" + ip + "', '" + hostname + "');";
+    
+    char* errMsg = nullptr;
+    sqlite3_exec(this->conn_.get(), sql.c_str(), nullptr, nullptr, &errMsg);
+    if (errMsg) sqlite3_free(errMsg);
+}
+
+
+
+std::string AccountTable::getHostname(const std::string& ip) {
+    std::string sql = "SELECT hostname FROM hosts WHERE ip = '" + ip + "';";
+    sqlite3_stmt* stmt = nullptr;
+    std::string result = "";
+
+    if (sqlite3_prepare_v2(this->conn_.get(), sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            const unsigned char* val = sqlite3_column_text(stmt, 0);
+            if (val) {
+                result = std::string(reinterpret_cast<const char*>(val));
+            }
+        }
+    }
+    sqlite3_finalize(stmt);
+    return result; // Trả về rỗng nếu không tìm thấy
+}
+

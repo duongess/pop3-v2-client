@@ -1,5 +1,7 @@
 #include <iostream>
 #include <sstream>
+#include <thread>
+#include <chrono>
 #include "cli.h"
 
 
@@ -11,7 +13,7 @@ CmdLineInterface::CmdLineInterface()
     bRunning = false;
 }
 
-CmdLineInterface::CmdLineInterface(const string& prompt)
+CmdLineInterface::CmdLineInterface(const std::string& prompt)
 {
     numCommands = 0;
     cmdPrompt = prompt;
@@ -28,7 +30,7 @@ void CmdLineInterface::clearScreen()
 #endif // __linux__
 }
 
-void CmdLineInterface::setCmdPrompt(const string& prompt)
+void CmdLineInterface::setCmdPrompt(const std::string& prompt)
 {
     this->cmdPrompt = prompt;
 }
@@ -36,10 +38,10 @@ void CmdLineInterface::setCmdPrompt(const string& prompt)
 // Hien thi dau nhac lenh
 void CmdLineInterface::showCmdPrompt()
 {
-    cout << this->cmdPrompt ;
+    std::cout << this->cmdPrompt ;
 }
 
-void CmdLineInterface::addCmd(const string& name, CLI_CMD_FUNC f)
+void CmdLineInterface::addCmd(const std::string& name, CLI_CMD_FUNC f)
 {
     this->cmdDoFunc[this->numCommands]=f;
     cmdNameList[this->numCommands] = name;
@@ -57,14 +59,14 @@ void CmdLineInterface::initConsole()
 }
 
 // Doc lenh nhap tu ban phim
-void CmdLineInterface::readCmd(string& cmd)
+void CmdLineInterface::readCmd(std::string& cmd)
 {
-    getline(cin,cmd);
+    getline(std::cin,cmd);
 }
 
 // Ham phan tich cu phap
 
-unsigned short CmdLineInterface::parseCmd(const string& cmd, string cmd_argv[], int& cmd_argc)
+unsigned short CmdLineInterface::parseCmd(const std::string& cmd, std::string cmd_argv[], int& cmd_argc)
 {
     // phan tich xau ki tu nguoi dung nhap vao de xac dinh lenh va tham so
 
@@ -75,7 +77,7 @@ unsigned short CmdLineInterface::parseCmd(const string& cmd, string cmd_argv[], 
 
     if(!cmd.empty())
     {
-        istringstream iss(cmd);
+        std::istringstream iss(cmd);
         while(iss.good() && cmd_argc < CMD_MAX_ARG_NUM)
         {
             iss >> cmd_argv[cmd_argc++];
@@ -100,17 +102,17 @@ unsigned short CmdLineInterface::parseCmd(const string& cmd, string cmd_argv[], 
 // ham thuc hien khi lenh khong dung "unknown"
 void CmdLineInterface::doUnknown()
 {
-    cerr << "Lenh khong duoc ho tro\nGo lenh help de duoc tro giup\n";
+    std::cout << "Lenh khong duoc ho tro\nGo lenh help de duoc tro giup\n";
 }
 
 // ham thuc hien lenh "quit"
 void CmdLineInterface::doQuit()
 {
     this->bRunning = false;
-    cout << "Chuong trinh ket thuc\n";
+    std::cout << "Chuong trinh ket thuc\n";
 }
 
-void CmdLineInterface::doCmd(unsigned short id, string cmd_argv[], int cmd_argc)
+void CmdLineInterface::doCmd(unsigned short id, std::string cmd_argv[], int cmd_argc)
 {
     if(id==CMD_NOOP_ID)
     {
@@ -134,8 +136,8 @@ void CmdLineInterface::doCmd(unsigned short id, string cmd_argv[], int cmd_argc)
 
 void CmdLineInterface::run(char* initArgv[], int initArgc)
 {
-    string cmd;  // command string
-    string cmdArgArray[CMD_MAX_ARG_NUM]; // arguments
+    std::string cmd;  // command std::string
+    std::string cmdArgArray[CMD_MAX_ARG_NUM]; // arguments
     int cmdArgCount;
     unsigned short cid;  // command id
     bRunning = true;
@@ -164,11 +166,36 @@ void CmdLineInterface::run(char* initArgv[], int initArgc)
     }
 }
 
+void CmdLineInterface::runRailway(char* initArgv[], int initArgc) {
+    std::string cmd;  // command std::string
+    std::string cmdArgArray[CMD_MAX_ARG_NUM]; // arguments
+    int cmdArgCount;
+    unsigned short cid;  // command id
+    bRunning = true;
+    bool isRun;
+    if (initArgc < 2) {
+        this->run();
+    } else {
+        showCmdPrompt();
+        for (int i = 1; i < initArgc; ++i) {
+            cmd += initArgv[i];
+            cmd += " "; 
+        }
+        std::cout << cmd << std::endl;
+        cid = parseCmd(cmd, cmdArgArray, cmdArgCount);
+        // thuc hien lenh va hien thi ket qua
+        doCmd(cid, cmdArgArray, cmdArgCount);
+        while (bRunning)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    };
+}
 
 void CmdLineInterface::run()
 {
-    string cmd;  // command string
-    string cmdArgArray[CMD_MAX_ARG_NUM]; // arguments
+    std::string cmd;  // command std::string
+    std::string cmdArgArray[CMD_MAX_ARG_NUM]; // arguments
     int cmdArgCount;
     unsigned short cid;  // command id
     bRunning = true;
